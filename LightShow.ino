@@ -10,6 +10,15 @@
 int brightPotentio = 0;
 int potentio1 = 1;
 int potentio2 = 2;
+int gate = 2;
+int envelop = 4;
+int audio = 5;
+int total = 0;
+int average = 0;
+int divident = 1;
+//int PIN_LED_OUT = 13;
+int previousSounds[] = {0,0};
+
 int ringStartingIndex[6] = {0, 32, 56, 72, 84, 92};
 /*index where each ring starts: [0, 32, 56, 72, 84, 92]
  * Ring 1 can be divided by 8 to access each corner
@@ -34,6 +43,14 @@ Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
 
 // setup() function -- runs once at startup --------------------------------
 
+//void soundISR()
+//{
+//  int pin_val;
+//
+//  pin_val = digitalRead(gate);
+//  digitalWrite(PIN_LED_OUT, pin_val);   
+//}
+
 void setup() {
   // These lines are specifically to support the Adafruit Trinket 5V 16 MHz.
   // Any other board, you can remove this part (but no harm leaving it):
@@ -47,18 +64,53 @@ void setup() {
   strip.setBrightness(20); // Set BRIGHTNESS to about 1/5 (max = 255)
   Serial.begin(9600);
   randomSeed(analogRead(5));
+//  pinMode(gate, INPUT);
+//  attachInterrupt(gate, soundISR, CHANGE);
 }
 
 
 // loop() function -- runs repeatedly as long as board is on ---------------
 
 void loop() {
-//  beatPulse();
+  bool drop = false;
+  int value = analogRead(analogRead(envelop));
+  total += value;
+  divident++;
+  average = total/divident;
+//  previousSounds[index] = value;
+//  if(index == 0){ //compare value1 against previousSounds[index + 1}
+//    if(previousSounds[index + 1] - value <= -75){ //negative so there was a drop
+//      drop = true;
+//    }
+//    index++;
+//  }
+//  else{
+//    if(previousSounds[index - 1] - value <= -75){ //negative so there was a drop
+//      drop = true;
+//    }
+//    index--;
+//  }
+  Serial.print("total: ");
+  Serial.println(total);
+  Serial.print("divident: ");
+  Serial.println(divident);
+  Serial.print("value: ");
+  Serial.println(value);
+  Serial.print("Average: ");
+  Serial.println(average);
+  delay(100);
+  //matrix();
+//  if(drop == true){
+//    strip.clear();
+//    strip.show();
+//    beatPulse();
+//    delay(50);
+//  }
 //  collapse(50);
 //  expand(50);
 //  smileyFace(300);
 //  snail(75);
-  matrix();
+  
   // Fill along the length of the strip in various colors...  
 //  colorWipe(strip.Color(255,   0,   0), 50); // Red
 //  colorWipe(strip.Color(  0, 255,   0), 50); // Green
@@ -71,6 +123,7 @@ void loop() {
 //
 //  rainbow(10);             // Flowing rainbow cycle along the whole strip
 //  theaterChaseRainbow(50); // Rainbow-enhanced theaterChase variant
+  //delay(25);
 }
 
 /* Immitates light falling from top to bottom, like matrix where there is a wall of numbers (time controlled by potentiometer)
@@ -283,7 +336,7 @@ void matrix()
   if(map(analogRead(brightPotentio), 0, 1023, 0, 500) >= 425) //we've slowed down a lot
   {
     collapse(50);
-    expand(50);
+     expand(50);
   }
 }
 
@@ -504,10 +557,10 @@ void beatPulse()
   strip.setBrightness(200);
   strip.show();                          //  Update strip to match
   Serial.println("Boom");
-  delay(150);
+  delay(15);
   strip.setBrightness(5);
   strip.show();
-  delay(300);
+  delay(15);
   strip.clear();
 }
 

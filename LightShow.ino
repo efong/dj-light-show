@@ -151,15 +151,16 @@ void spin()
 	int line8[] = {92, 85, 58, 35, 4};
 	int allLines[] = { line1, line2, line3, line4, line5, line6, line7, line8 };
 	int j = 4;
+  
 	for(int i = 0; i < sizeof(allLines)/ sizeof(*allLines); ++i){
 		strip.setBrightness(map(analogRead(brightPotentio), 0, 1023, 0, 255));
     if(i % 2 == 0){
-      lightUpSpecifics(allLines[i], strip.Color(0, 255, map(analogRead(potentio1), 0, 1023, 0, 255)), 6);
-      lightUpSpecifics(allLines[j], strip.Color(255, 0, map(analogRead(potentio1), 0, 1023, 0, 255)), 6);
+      lightUpSpecifics(allLines[i], 6);
+      lightUpSpecifics(allLines[j], 6);
     }
     else{
-      lightUpSpecifics(allLines[i], strip.Color(0, 255, map(analogRead(potentio1), 0, 1023, 0, 255)), 5);
-      lightUpSpecifics(allLines[j], strip.Color(255, 0, map(analogRead(potentio1), 0, 1023, 0, 255)), 5);
+      lightUpSpecifics(allLines[i], 5);
+      lightUpSpecifics(allLines[j], 5);
     }
     ++j;
     if(j > 7)
@@ -586,12 +587,13 @@ void collapse(int option)
 }
 
 /* Function that receives an array of leds to light up, different than lightUpASection because that one lights up from start to end (range)
-*  While this function lights up specific leds that are provided to us through an array
+*  While this function lights up specific leds that are provided to us through an array with random colors using hue -> rgb
 */
-void lightUpSpecifics(int ledArray[], uint32_t color, int arrSize)
-{
+void lightUpSpecifics(int ledArray[], int arrSize)
+{   
 	for(int i = 0; i < arrSize; ++i){
-		strip.setPixelColor(ledArray[i], color);
+    int pixelHue = random(0-256) * random(0-256) + (map(analogRead(potentio1), 0, 1023, 0, 92) * 65536L / strip.numPixels());
+		strip.setPixelColor(ledArray[i], strip.gamma32(strip.ColorHSV(pixelHue)));
 	}
 	strip.show();
 }
